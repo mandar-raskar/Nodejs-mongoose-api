@@ -1,16 +1,25 @@
 {
-  "name": "nodebook",
+  "name": "nodeapi",
   "version": "1.0.0",
-  "description": "Book store based on nodejs",
+  "description": "Node operations on api",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
   },
+  "keywords": [
+    "Node",
+    "operations"
+  ],
   "author": "Self",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
-    "mongoose": "^5.0.14"
+    "mongoose": "^5.0.14",
+    "morgan": "^1.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.3"
   }
 }
