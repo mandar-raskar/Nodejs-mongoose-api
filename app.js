@@ -1,55 +1,117 @@
-const express = require('express');
-const app = express();
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+var express = require("express");
+var bodyParser = require("body-parser");
+var mongoose = require("mongoose");
 
-const productRoutes = require('./api/routes/products');
-const ordersRoutes = require('./api/routes/orders');
+Genre = require("./models/genre");
+Book = require("./models/books");
 
-mongoose.connect('mongodb+srv://node-api:' + process.env.MONGO_ATLAS_PW + '@cluster0-jpdvz.mongodb.net/test',
-{
-    useMongoClient : true
-}
-);
+var app = express();
 
-app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-app.use('/products', productRoutes);
-app.use('/orders', ordersRoutes);
+mongoose.connect("mongodb://localhost:27017/book");
+var db = mongoose.connection;
 
-app.use((req,res,next)=>{
-    res.headers('Access-Control-Allow-Origin','*');
-    res.headers('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    if(req.method === 'OPTIONS'){
-        res.headers('Access-Control-Allow-Headers','GET, POST, PATCH, DELETE');
+app.get("/", function(req,res){
+  res.send("hello");
+});
+
+app.get("/api/genres",function(req,res){
+  Genre.getgenres(function(err,genre){
+    if(err){
+    throw err;
+  }
+  res.json(genre);
+  });
+});
+
+
+app.post("/api/genres",function(req,res){
+  var genre =req.body;
+  Genre.addgenres(genre,function(err,genre){
+    if(err){
+    throw err;
+  }
+  res.json(genre);
+  });
+});
+
+app.put("/api/genres/:_id", function(req,res){
+  var id = req.params._id;
+  var genre = req.body;
+  Genre.updategenre(id,genre,{},function(err,genre){
+    if (err){
+    throw err;
+  }
+  res.json(genre);
+});
+});
+
+app.delete("/api/genres/:_id", function(req,res){
+  var id = req.params._id;
+  Genre.removegenre(id, function(err,genre){
+    if(err){
+      throw err;
+      }
+    res.json(genre);
+  });
+});
+
+
+  app.get("/api/books",function(req,res){
+    Book.getbooks(function(err,books){
+      if(err){
+      throw err;
     }
-    next();
-});
-
-app.use((req,res,next)=>{
-    const error = new error('not found');
-    error.status = 404;
-    next(error);
+    res.json(books);
+  });
 
 });
 
-app.use((error,req,res,next)=>{
-    res.status(error.status || 500);
-    res.json({
-        error:{
-        message : error.message
-        }
-    });
+app.get("/api/books/:_id",function(req,res){
+  Book.getbookById(req.params._id,function(err,bookId){
+    if(err){
+    throw err;
+  }
+  res.json(bookId);
 });
 
-/*app.use((req,res,next)=>{
-    res.status(200).json({
-        message:"it works"
-    });
 });
-*/
 
-module.exports = app;
+app.post("/api/books",function(req,res){
+  var book = req.body;
+  Book.addbook(book, function(err,book){
+    if (err){
+      throw err;
+    }
+    res.json(book);
+  });
+});
+
+app.put("/api/books/:_id",function(req,res){
+  var id = req.params._id;
+  var book = req.body;
+  Book.updatebook(id,book,{},function(err,book){
+    if(err){
+      throw err;
+    }
+    res.json(book);
+  });
+});
+
+app.delete("/api/books/:_id",function(req,res){
+  var id = req.params._id;
+  Book.removebook(id, function(err,book){
+    if (err){
+      throw err;
+    }
+    res.json(book);
+  });
+});
+
+
+
+
+app.listen(3004);
+console.log("server is running on port no. 3000");
